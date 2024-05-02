@@ -19,6 +19,8 @@ try:
 except ImportError:
     print('Installing required packages...')
     os.system('pip install aiohttp pytz')
+    import aiohttp
+    import pytz
 
 
 class AuthenticationError(Exception):
