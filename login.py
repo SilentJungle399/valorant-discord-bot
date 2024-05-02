@@ -5,8 +5,9 @@ import re
 import ssl
 from datetime import datetime, timedelta
 from typing import Any
-from tkinter import Tk # i hate this lib
+from typing import Tuple
 import os
+
 
 # Third
 try:
@@ -185,7 +186,7 @@ class Auth:
         else:
             return entitlements_token
 
-    async def get_userinfo(self, access_token: str) -> tuple[str, str, str]:
+    async def get_userinfo(self, access_token: str) -> Tuple[str, str, str]:
         """This function is used to get the user info."""
 
         # language

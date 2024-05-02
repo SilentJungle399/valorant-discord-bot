@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
-from typing import Any
+from typing import Any, Tuple
 
 from ..errors import DatabaseError
 from .auth import Auth
@@ -150,7 +150,7 @@ class DATABASE:
         }
         return data
 
-    async def refresh_token(self, user_id: int, data: dict[str, Any]) -> tuple[str, str]:
+    async def refresh_token(self, user_id: int, data: dict[str, Any]) -> Tuple[str, str]:
         """Refresh token"""
 
         auth = self.auth

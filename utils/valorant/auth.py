@@ -5,7 +5,7 @@ import json
 import re
 import ssl
 from datetime import datetime, timedelta
-from typing import Any
+from typing import Any, Tuple
 
 # Third
 import aiohttp
@@ -29,7 +29,7 @@ def _extract_tokens(data: str) -> str:
     return response
 
 
-def _extract_tokens_from_uri(url: str) -> tuple[str, str]:
+def _extract_tokens_from_uri(url: str) -> Tuple[str, str]:
     try:
         access_token = url.split('access_token=')[1].split('&scope')[0]
         token_id = url.split('id_token=')[1].split('&')[0]
@@ -178,7 +178,7 @@ class Auth:
         else:
             return entitlements_token
 
-    async def get_userinfo(self, access_token: str) -> tuple[str, str, str]:
+    async def get_userinfo(self, access_token: str) -> Tuple[str, str, str]:
         """This function is used to get the user info."""
 
         # language
