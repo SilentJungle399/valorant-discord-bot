@@ -15,9 +15,10 @@ warnings.filterwarnings("ignore")
 # Third
 try:
     import aiohttp
+    import pytz
 except ImportError:
     print('Installing required packages...')
-    os.system('pip install aiohttp')
+    os.system('pip install aiohttp pytz')
 
 
 class AuthenticationError(Exception):
@@ -144,6 +145,7 @@ class Auth:
             token_id = response[1]
 
             expiry_token = datetime.now() + timedelta(minutes=59)
+            expiry_token = expiry_token.replace(tzinfo=pytz.utc)
             cookies['expiry_token'] = int(datetime.timestamp(expiry_token))  # type: ignore
 
             return {'auth': 'response', 'data': {'cookie': cookies, 'access_token': access_token, 'token_id': token_id}}
@@ -281,7 +283,7 @@ async def main():
         region = await auth.get_region(access_token, token_id)
         player_name = f'{name}#{tag}' if tag is not None and tag is not None else 'no_username'
 
-        expiry_token = datetime.timestamp(datetime.utcnow() + timedelta(minutes=59))
+        expiry_token = datetime.timestamp(datetime.now(tz = pytz.utc) + timedelta(minutes=59))
 
         data = {
             'cookie': cookie,

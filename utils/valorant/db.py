@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
+import pytz
 from typing import Any, Tuple
 
 from ..errors import DatabaseError
@@ -11,7 +12,7 @@ from .useful import JSON
 
 
 def timestamp_utc() -> float:
-    return datetime.timestamp(datetime.utcnow())
+    return datetime.timestamp(datetime.now(tz = pytz.utc))
 
 
 class DATABASE:
