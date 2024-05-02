@@ -114,7 +114,7 @@ class ValorantCog(commands.Cog, name='Valorant'):
         _file = discord.File('login.py')
 
         embed = discord.Embed(
-            description = '<a:AFaunaBAWL:1180425575752544266> please run this file and paste the output here',
+            description = '<a:AFaunaBAWL:1180425575752544266> please run this file and paste the output here \n\n Guide to run the file: [here](https://discord.com/channels/990883572938321960/1015872050230988840/1235617512750579733) \n Guide to install Python: [here](https://discord.com/channels/990883572938321960/1015872050230988840/1235622121267396679)',
             color=discord.Color.blurple()
         )
 
