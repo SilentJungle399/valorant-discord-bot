@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import contextlib
 from typing import TYPE_CHECKING, Literal
+import json
 
 from discord import Interaction, app_commands, ui
+import discord
 from discord.ext import commands, tasks
 from discord.utils import MISSING
 
@@ -23,6 +25,27 @@ if TYPE_CHECKING:
     from bot import ValorantBot
 
 
+class InputModal(ui.Modal, title = "login thingy"):
+    text = ui.TextInput(placeholder='Input here', required=True, label="Script output", style = discord.TextStyle.long)
+
+    async def on_submit(self, interaction: Interaction) -> None:
+        try:
+            data = json.loads(self.text.value)
+            user = data['username']
+        except json.JSONDecodeError:
+            return await interaction.response.send_message('Invalid data entered <a:AFaunaBAWL:1180425575752544266>', ephemeral=True)
+
+        await interaction.response.send_message(f'<:yanfeiwow:1235589416035029013> halo {user}')
+
+        with open('data/users.json', 'r') as f:
+            users = json.load(f)
+
+        users[str(interaction.user.id)] = data
+
+        with open('data/users.json', 'w') as f:
+            json.dump(users, f, indent=4)
+
+        
 class ValorantCog(commands.Cog, name='Valorant'):
     """Valorant API Commands"""
 
@@ -83,34 +106,58 @@ class ValorantCog(commands.Cog, name='Valorant'):
         endpoint = self.endpoint
         endpoint.activate(data)  # type: ignore
         return endpoint
+    
+    @app_commands.command(description='Import valorant login data', name = 'import')
+    async def _import(self, interaction: Interaction[ValorantBot]) -> None:
+        await interaction.response.defer()
+        
+        _file = discord.File('login.py')
 
-    @app_commands.command(description='Log in with your Riot acoount')
-    @app_commands.describe(username='Input username', password='Input password')
-    # @dynamic_cooldown(cooldown_5s)
-    async def login(self, interaction: Interaction[ValorantBot], username: str, password: str) -> None:
-        response = ResponseLanguage(interaction.command.name, interaction.locale)  # type: ignore
+        embed = discord.Embed(
+            description = '<a:AFaunaBAWL:1180425575752544266> please run this file and paste the output here',
+            color=discord.Color.blurple()
+        )
 
-        user_id = interaction.user.id
-        auth = self.db.auth
-        auth.locale_code = interaction.locale  # type: ignore
-        authenticate = await auth.authenticate(username, password)
+        v = ui.View()
+        button = ui.Button(label='Submit', style=discord.ButtonStyle.primary)
 
-        if authenticate['auth'] == 'response':  # type: ignore
-            await interaction.response.defer(ephemeral=True)
-            login = await self.db.login(user_id, authenticate, interaction.locale)  # type: ignore
+        async def callback(interaction: Interaction):
+            await interaction.response.send_modal(InputModal())
 
-            if login['auth']:  # type: ignore
-                embed = Embed(f"{response.get('SUCCESS')} **{login['player']}!**")  # type: ignore
-                return await interaction.followup.send(embed=embed, ephemeral=True)
+        button.callback = callback
 
-            raise ValorantBotError(f"{response.get('FAILED')}")
+        v.add_item(button)
 
-        elif authenticate['auth'] == '2fa':  # type: ignore
-            cookies = authenticate['cookie']  # type: ignore
-            message = authenticate['message']  # type: ignore
-            label = authenticate['label']  # type: ignore
-            modal = View.TwoFA_UI(interaction, self.db, cookies, message, label, response)
-            await interaction.response.send_modal(modal)
+        await interaction.followup.send(embed = embed, file = _file, view = v)
+
+
+    # @app_commands.command(description='Log in with your Riot acoount')
+    # @app_commands.describe(username='Input username', password='Input password')
+    # # @dynamic_cooldown(cooldown_5s)
+    # async def login(self, interaction: Interaction[ValorantBot], username: str, password: str) -> None:
+    #     response = ResponseLanguage(interaction.command.name, interaction.locale)  # type: ignore
+
+    #     user_id = interaction.user.id
+    #     auth = self.db.auth
+    #     auth.locale_code = interaction.locale  # type: ignore
+    #     authenticate = await auth.authenticate(username, password)
+
+    #     if authenticate['auth'] == 'response':  # type: ignore
+    #         await interaction.response.defer(ephemeral=True)
+    #         login = await self.db.login(user_id, authenticate, interaction.locale)  # type: ignore
+
+    #         if login['auth']:  # type: ignore
+    #             embed = Embed(f"{response.get('SUCCESS')} **{login['player']}!**")  # type: ignore
+    #             return await interaction.followup.send(embed=embed, ephemeral=True)
+
+    #         raise ValorantBotError(f"{response.get('FAILED')}")
+
+    #     elif authenticate['auth'] == '2fa':  # type: ignore
+    #         cookies = authenticate['cookie']  # type: ignore
+    #         message = authenticate['message']  # type: ignore
+    #         label = authenticate['label']  # type: ignore
+    #         modal = View.TwoFA_UI(interaction, self.db, cookies, message, label, response)
+    #         await interaction.response.send_modal(modal)
 
     @app_commands.command(description='Logout and Delete your account from database')
     # @dynamic_cooldown(cooldown_5s)
