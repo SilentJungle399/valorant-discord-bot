@@ -8,6 +8,9 @@ from typing import Any
 from typing import Tuple
 import os
 
+import warnings
+warnings.filterwarnings("ignore")
+
 
 # Third
 try:
@@ -301,4 +304,8 @@ async def main():
         print(e)
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(main())
+    print("\n\nPress Ctrl+C to exit.")
+    loop.run_forever()
