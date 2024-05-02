@@ -289,7 +289,7 @@ class API_ENDPOINT:
     def __build_headers(self, headers: dict[str, Any]) -> dict[str, Any]:
         """build headers"""
         headers['X-Riot-ClientPlatform'] = self.client_platform
-        headers['X-Riot-ClientVersion'] = self._get_client_version()
+        headers['X-Riot-ClientVersion'] = "release-08.08-shipping-2-2470575"  # self._get_client_version()
         return headers
 
     def __format_region(self) -> None:
