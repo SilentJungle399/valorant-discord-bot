@@ -4,7 +4,8 @@ import contextlib
 import json
 import os
 import uuid
-from datetime import UTC, datetime
+import pytz
+from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 import discord
@@ -74,7 +75,7 @@ def calculate_level_xp(level: int) -> int:  # https://github.com/giorgi-o
 def iso_to_time(iso: str) -> datetime:
     """Convert ISO time to datetime"""
     timestamp = datetime.strptime(iso, '%Y-%m-%dT%H:%M:%S%z').timestamp()
-    time = datetime.utcfromtimestamp(timestamp)
+    time = datetime.fromtimestamp(timestamp, tz = pytz.utc)
     return time
 
 
@@ -82,7 +83,7 @@ def format_dt(dt: datetime, style: str | None = None) -> str:
     """datatime to time format"""
 
     if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=UTC)
+        dt = dt.replace(tzinfo=pytz.utc)
 
     if style is None:
         return f'<t:{int(dt.timestamp())}>'
